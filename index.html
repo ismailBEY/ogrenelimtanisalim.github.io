@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soru-Cevap Anketi</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      max-width: 400px;
+      width: 90%;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      background: #f4f4f4;
+      padding: 10px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+      display: block;
+    }
+
+    input[type="radio"] {
+      display: none;
+    }
+
+    input[type="radio"]:checked + label {
+      background: #dfe8ff;
+      border-color: #5a73ff;
+      color: #2a2a8f;
+      font-weight: 600;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      resize: none;
+      margin-bottom: 15px;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: #5a73ff;
+      outline: none;
+      box-shadow: 0 0 3px rgba(90,115,255,0.5);
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(to right, #5a73ff, #4d5cff);
+      border: none;
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .result {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 15px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="question">Hoş geldin! Hazırsan başlayalım 🎯</h1>
+    <form id="quizForm">
+      <div id="options" class="options"></div>
+      <div id="textAnswerContainer" style="display:none;">
+        <textarea id="textAnswer" rows="3" placeholder="Cevabını buraya yaz..."></textarea>
+      </div>
+      <button id="nextBtn" type="button">Sonraki</button>
+    </form>
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    // 🔗 Formspree bağlantın (kendi linkini buraya koy!)
+    const FORMSPREE_URL = "https://formspree.io/f/mnngozeo";
+
+    // 📋 Sorular (ilk 5 şıklı, sonuncu metinli)
+    const questions = [
+      {
+        type: "radio",
+        question: "En çok hangi mevsimi seversin?",
+        options: ["İlkbahar 🌸", "Yaz ☀️", "Sonbahar 🍂", "Kış ❄️"]
+      },
+      {
+        type: "radio",
+        question: "Günün hangi saatinde daha enerjiksin?",
+        options: ["Sabah", "Öğle", "Akşam", "Gece"]
+      },
+      {
+        type: "radio",
+        question: "Aşağıdakilerden hangisini yapmayı daha çok seversin?",
+        options: ["Kitap okumak", "Film izlemek", "Spor yapmak", "Müzik dinlemek"]
+      },
+      {
+        type: "radio",
+        question: "En çok hangi tür müziği dinlersin?",
+        options: ["Pop", "Rock", "Klasik", "Rap"]
+      },
+      {
+        type: "radio",
+        question: "Kendini nasıl tanımlarsın?",
+        options: ["Planlı", "Spontane", "Sakin", "Macera sever"]
+      },
+      {
+        type: "text",
+        question: "Hayatta seni en çok motive eden şey nedir?"
+      }
+    ];
+
+    let current = 0;
+    const answers = {};
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const textAnswerContainer = document.getElementById("textAnswerContainer");
+    const textAnswerEl = document.getElementById("textAnswer");
+    const resultEl = document.getElementById("result");
+    const nextBtn = document.getElementById("nextBtn");
+
+    // İlk soruyu yükle
+    loadQuestion();
+
+    function loadQuestion() {
+      const q = questions[current];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = "";
+      textAnswerContainer.style.display = "none";
+
+      if (q.type === "radio") {
+        q.options.forEach((opt, i) => {
+          const id = `opt${i}`;
+          optionsEl.innerHTML += `
+            <div>
+              <input type="radio" name="answer" id="${id}" value="${opt}">
+              <label for="${id}">${opt}</label>
+            </div>
+          `;
+        });
+      } else if (q.type === "text") {
+        textAnswerContainer.style.display = "block";
+      }
+    }
+
+    nextBtn.addEventListener("click", async () => {
+      const q = questions[current];
+      let answerValue = "";
+
+      if (q.type === "radio") {
+        const selected = document.querySelector("input[name='answer']:checked");
+        if (!selected) return alert("Lütfen bir seçenek seçin!");
+        answerValue = selected.value;
+      } else if (q.type === "text") {
+        const text = textAnswerEl.value.trim();
+        if (!text) return alert("Lütfen bir cevap yaz.");
+        answerValue = text;
+      }
+
+      answers[`Soru ${current + 1}`] = `${q.question} => ${answerValue}`;
+      current++;
+
+      if (current < questions.length) {
+        loadQuestion();
+        textAnswerEl.value = "";
+      } else {
+        // Tüm sorular bitti
+        questionEl.textContent = "🎉 Tüm cevapların kaydediliyor...";
+        optionsEl.style.display = "none";
+        textAnswerContainer.style.display = "none";
+        nextBtn.style.display = "none";
+
+        const formData = new FormData();
+        Object.keys(answers).forEach(key => {
+          formData.append(key, answers[key]);
+        });
+
+        try {
+          const res = await fetch(FORMSPREE_URL, {
+            method: "POST",
+            body: formData,
+            headers: { "Accept": "application/json" }
+          });
+
+          if (res.ok) {
+            resultEl.innerHTML = "✅ Cevapların başarıyla gönderildi! Teşekkür ederiz.";
+          } else {
+            resultEl.innerHTML = "⚠️ Bir hata oluştu. Lütfen tekrar deneyin.";
+          }
+        } catch (err) {
+          resultEl.innerHTML = "🚫 Bağlantı hatası: " + err.message;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
