@@ -3,25 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Soru-Cevap Anketi</title>
+  <title>💘 ESK Tanıma Testi</title>
   <style>
     body {
-      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      background: linear-gradient(135deg, #f8cdda, #1d2b64);
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       font-family: 'Poppins', sans-serif;
+      margin: 0;
+      color: #333;
+      overflow: hidden;
     }
 
-    .card {
-      background: white;
+    .card, .welcome {
+      background: rgba(255, 255, 255, 0.9);
       padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-      max-width: 400px;
+      border-radius: 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      max-width: 420px;
       width: 90%;
-      animation: fadeIn 0.6s ease;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+      backdrop-filter: blur(6px);
     }
 
     @keyframes fadeIn {
@@ -30,9 +35,15 @@
     }
 
     h1 {
-      font-size: 20px;
-      margin-bottom: 20px;
-      text-align: center;
+      font-size: 30px;
+      color: #b61e6d;
+      margin-bottom: 15px;
+    }
+
+    p {
+      color: #444;
+      margin-bottom: 25px;
+      font-size: 18px;
     }
 
     .options {
@@ -43,7 +54,7 @@
     }
 
     label {
-      background: #f4f4f4;
+      background: #fff0f6;
       padding: 10px 15px;
       border-radius: 12px;
       cursor: pointer;
@@ -57,9 +68,9 @@
     }
 
     input[type="radio"]:checked + label {
-      background: #dfe8ff;
-      border-color: #5a73ff;
-      color: #2a2a8f;
+      background: #ffccde;
+      border-color: #b61e6d;
+      color: #7b1045;
       font-weight: 600;
     }
 
@@ -73,15 +84,9 @@
       margin-bottom: 15px;
     }
 
-    input[type="text"]:focus, textarea:focus {
-      border-color: #5a73ff;
-      outline: none;
-      box-shadow: 0 0 3px rgba(90,115,255,0.5);
-    }
-
     button {
       width: 100%;
-      background: linear-gradient(to right, #5a73ff, #4d5cff);
+      background: linear-gradient(to right, #ff7eb3, #ff758c);
       border: none;
       color: white;
       padding: 12px;
@@ -89,6 +94,8 @@
       border-radius: 10px;
       cursor: pointer;
       transition: 0.3s;
+      font-weight: bold;
+      letter-spacing: 0.5px;
     }
 
     button:hover {
@@ -101,76 +108,223 @@
       font-size: 15px;
       color: #333;
     }
+
+    .hidden { display: none; }
+
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #ffb6c1;
+      transform: rotate(45deg);
+      animation: float 6s infinite ease-in-out;
+      opacity: 0.8;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #ffb6c1;
+      border-radius: 50%;
+    }
+
+    .heart::before { top: -10px; left: 0; }
+    .heart::after { top: 0; left: -10px; }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(45deg); opacity: 1; }
+      100% { transform: translateY(-700px) rotate(45deg); opacity: 0; }
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1 id="question">Hoş geldin! Hazırsan başlayalım 🎯</h1>
+
+  <!-- Kalpler -->
+  <div class="heart" style="left:10%; animation-delay:0s;"></div>
+  <div class="heart" style="left:30%; animation-delay:2s;"></div>
+  <div class="heart" style="left:50%; animation-delay:4s;"></div>
+  <div class="heart" style="left:70%; animation-delay:1s;"></div>
+  <div class="heart" style="left:90%; animation-delay:3s;"></div>
+
+  <!-- Hoş geldin ekranı -->
+  <div class="welcome" id="welcomeScreen">
+    <h1>💘 Hoş Geldin Elif Sude! 💘</h1>
+    <p>
+    Hazırsan seninle ilgili birkaç soru soracağım... 💞<br>
+    Cevap vermek zorunluuuu!!!</p>
+    <button id="startBtn">Teste Başla 💖</button>
+  </div>
+
+  <!-- Test ekranı -->
+  <div class="card hidden" id="quizCard">
+    <h1 id="question"></h1> 
     <form id="quizForm">
       <div id="options" class="options"></div>
-      <div id="textAnswerContainer" style="display:none;">
-        <textarea id="textAnswer" rows="3" placeholder="Cevabını buraya yaz..."></textarea>
+      <div id="extraTextContainer" style="display:none;">
+        <input type="text" id="extraText" placeholder="İstersen biraz daha anlat... 💌">
       </div>
-      <button id="nextBtn" type="button">Sonraki</button>
+      <div id="textAnswerContainer" style="display:none;">
+        <textarea id="textAnswer" rows="3" placeholder="Duygularını burada paylaş..."></textarea>
+      </div>
+      <button id="nextBtn" type="button">Sonraki 💫</button>
     </form>
     <div id="result" class="result"></div>
   </div>
 
   <script>
-    // 🔗 Formspree bağlantın (kendi linkini buraya koy!)
-    const FORMSPREE_URL = "https://formspree.io/f/mnngozeo";
+    const FORMSPREE_URL = "https://formspree.io/f/mnngozeo"; // 💌 kendi Formspree linkini ekle!
 
-    // 📋 Sorular (ilk 5 şıklı, sonuncu metinli)
     const questions = [
       {
-        type: "radio",
-        question: "En çok hangi mevsimi seversin?",
-        options: ["İlkbahar 🌸", "Yaz ☀️", "Sonbahar 🍂", "Kış ❄️"]
+        type: "text",
+        question: "Tam şuan ne yapıyorsun?",
       },
       {
         type: "radio",
-        question: "Günün hangi saatinde daha enerjiksin?",
-        options: ["Sabah", "Öğle", "Akşam", "Gece"]
+        question: "Hayat nasıl gidiyor?",
+        options: ["Mükemmel", "Fena değil", "Berbat", "Çalkantılı"],
+        allowText: true
       },
       {
         type: "radio",
-        question: "Aşağıdakilerden hangisini yapmayı daha çok seversin?",
-        options: ["Kitap okumak", "Film izlemek", "Spor yapmak", "Müzik dinlemek"]
+        question: "Dersler Nasıl?",
+        options: ["Çalışmaya çalışıyorum", "Bende bilmiyorum", "hiç sorma rezalet ", "Mükemmel"],
+        allowText: true
       },
       {
         type: "radio",
-        question: "En çok hangi tür müziği dinlersin?",
-        options: ["Pop", "Rock", "Klasik", "Rap"]
-      },
-      {
-        type: "radio",
-        question: "Kendini nasıl tanımlarsın?",
-        options: ["Planlı", "Spontane", "Sakin", "Macera sever"]
+        question: "Seni rahatsız ettim mi/ediyor muyum?",
+        options: ["evet", "hayır", "biraz", "beni rahtsız edemezsin"],
+        allowText: true
       },
       {
         type: "text",
-        question: "Hayatta seni en çok motive eden şey nedir?"
+        question: "Bir günün nasıl geçiyor?",
+      },
+      {
+        type: "radio",
+        question: "Manitan,sevdiğin,hoşlandığın,konuştuğun varmı?",
+        options: ["var", "yok","arıyoz"],
+        allowText: true
+      },
+      {
+        type: "radio",
+        question: "Aramız Nasıl?",
+        options: ["İyi", "Kötü", "aramız yok", "Bilmiyorum"],
+        allowText: true
+      },
+      {
+        type: "image",
+        question: "Bu fotoğrafa baktığında ne hissediyorsun? Sana benzerliği kaç.",
+        image: "https://resmim.net/cdn/2025/10/16/j4BRRQ.png", // 📸 kendi fotoğrafının URL'si
+        options: ["0-2", "2-4", "4-6", "6-8","8-10"],
+        allowText: true
+      },
+      {
+        type: "text",
+        question: "Yaz tatilinden memnunmsun? Genel olarak nasıldı?iyi kötü yönleri.",
+      },
+      {
+        type: "text",
+        question: "Manitacılık işleri hakkında düşüncen",
+      },
+      {
+        type: "radio",
+        question: "Bir gün buluşma,konuşma ihtimalimiz?(Date)",
+        options: ["yok", "1/1000", "1/100", "1/10","Düşünmem Lazım","Düşünmeme gerek bile yok","👍"],
+        allowText: true
+      },
+      {
+        type: "radio",
+        question: "Aşık olduğunda genelde ne yaparsın?",
+        options: ["Sessizce izlerim 💭", "Yaklaşmaya çalışırım 💬", "Duygularımı gizlerim 💌", "Direkt söylerim 💥"],
+        allowText: true
+      },
+      {
+        type: "radio",
+        question: "Birinin sana ilgi duyduğunu nasıl anlarsın?",
+        options: ["Bakışlarından 👀", "Davranışlarından 💞", "Mesajlarından 💬", "Sadece hissederim 💫"]
+      },
+      
+      {
+        type: "radio",
+        question: "En romantik bulduğun şey hangisi?",
+        options: ["Mektup almak 💌", "Gecenin sessizliği 🌙", "El ele yürümek 🌸", "Bir bakışta her şeyi anlatmak 👀"]
+      },
+      {
+        type: "radio",
+        question: "Sevdiğin kişiye duygularını nasıl belli edersin?",
+        options: ["Küçük jestlerle 🎁", "Sözlerle 💬", "Bakışlarla 👀", "Belli etmem 🙊"],
+        allowText: true
+      },
+      {
+        type: "radio",
+        question: "İlk görüşte aşka inanır mısın?",
+        options: ["Evet 💘", "Hayır 🤔", "Belki 💭"]
+      },
+      {
+        type: "radio",
+        question: "Bir ilişki senin için ne ifade eder?",
+        options: ["Güven 🤝", "Tutku 🔥", "Sadakat 💍", "Paylaşım 💞"],
+        allowText: true
+      },
+      {
+        type: "text",
+        question: "Son Olarak Sence gerçek aşk nedir? 💖 Duygularını serbestçe yaz..."
       }
     ];
 
     let current = 0;
     const answers = {};
-
     const questionEl = document.getElementById("question");
     const optionsEl = document.getElementById("options");
     const textAnswerContainer = document.getElementById("textAnswerContainer");
     const textAnswerEl = document.getElementById("textAnswer");
+    const extraTextContainer = document.getElementById("extraTextContainer");
+    const extraTextEl = document.getElementById("extraText");
     const resultEl = document.getElementById("result");
     const nextBtn = document.getElementById("nextBtn");
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const quizCard = document.getElementById("quizCard");
+    const startBtn = document.getElementById("startBtn");
 
-    // İlk soruyu yükle
-    loadQuestion();
+    startBtn.addEventListener("click", () => {
+      welcomeScreen.classList.add("hidden");
+      quizCard.classList.remove("hidden");
+      loadQuestion();
+    });
 
     function loadQuestion() {
       const q = questions[current];
       questionEl.textContent = q.question;
       optionsEl.innerHTML = "";
       textAnswerContainer.style.display = "none";
+      extraTextContainer.style.display = "none";
+
+      if (q.type === "image") {
+        optionsEl.innerHTML = `<img src="${q.image}" alt="soru görseli">`;
+        q.options.forEach((opt, i) => {
+          const id = `opt${i}`;
+          optionsEl.innerHTML += `
+            <div>
+              <input type="radio" name="answer" id="${id}" value="${opt}">
+              <label for="${id}">${opt}</label>
+            </div>
+          `;
+        });
+        if (q.allowText) extraTextContainer.style.display = "block";
+        return;
+      }
 
       if (q.type === "radio") {
         q.options.forEach((opt, i) => {
@@ -182,6 +336,7 @@
             </div>
           `;
         });
+        if (q.allowText) extraTextContainer.style.display = "block";
       } else if (q.type === "text") {
         textAnswerContainer.style.display = "block";
       }
@@ -191,13 +346,16 @@
       const q = questions[current];
       let answerValue = "";
 
-      if (q.type === "radio") {
+      if (q.type === "radio" || q.type === "image") {
         const selected = document.querySelector("input[name='answer']:checked");
-        if (!selected) return alert("Lütfen bir seçenek seçin!");
+        if (!selected) return alert("Lütfen bir seçenek seç 💞");
         answerValue = selected.value;
+        if (q.allowText && extraTextEl.value.trim() !== "") {
+          answerValue += ` | Açıklama: ${extraTextEl.value.trim()}`;
+        }
       } else if (q.type === "text") {
         const text = textAnswerEl.value.trim();
-        if (!text) return alert("Lütfen bir cevap yaz.");
+        if (!text) return alert("Lütfen birkaç kelime yaz 💌");
         answerValue = text;
       }
 
@@ -207,11 +365,12 @@
       if (current < questions.length) {
         loadQuestion();
         textAnswerEl.value = "";
+        extraTextEl.value = "";
       } else {
-        // Tüm sorular bitti
-        questionEl.textContent = "🎉 Tüm cevapların kaydediliyor...";
+        questionEl.textContent = "💌 Cevapların gönderiliyor...";
         optionsEl.style.display = "none";
         textAnswerContainer.style.display = "none";
+        extraTextContainer.style.display = "none";
         nextBtn.style.display = "none";
 
         const formData = new FormData();
@@ -227,9 +386,9 @@
           });
 
           if (res.ok) {
-            resultEl.innerHTML = "✅ Cevapların başarıyla gönderildi! Teşekkür ederiz.";
+            resultEl.innerHTML = "💖 Cevapların başarıyla gönderildi! Kalbini paylaştığın için teşekkürler.";
           } else {
-            resultEl.innerHTML = "⚠️ Bir hata oluştu. Lütfen tekrar deneyin.";
+            resultEl.innerHTML = "⚠️ Bir hata oluştu, lütfen tekrar dene.";
           }
         } catch (err) {
           resultEl.innerHTML = "🚫 Bağlantı hatası: " + err.message;
