@@ -2,28 +2,34 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <title>💘 ESK Tanıma Testi</title>
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       background: linear-gradient(135deg, #f8cdda, #1d2b64);
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       font-family: 'Poppins', sans-serif;
       margin: 0;
       color: #333;
-      overflow: hidden;
+      overflow-x: hidden;
+      padding: 10px;
     }
 
     .card, .welcome {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 40px;
-      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 25px;
+      border-radius: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      width: 100%;
       max-width: 420px;
-      width: 90%;
       text-align: center;
       animation: fadeIn 0.8s ease;
       backdrop-filter: blur(6px);
@@ -35,32 +41,36 @@
     }
 
     h1 {
-      font-size: 30px;
+      font-size: 1.6rem;
       color: #b61e6d;
       margin-bottom: 15px;
+      line-height: 1.3;
     }
 
     p {
       color: #444;
-      margin-bottom: 25px;
-      font-size: 18px;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      line-height: 1.5;
     }
 
     .options {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 15px;
     }
 
     label {
       background: #fff0f6;
-      padding: 10px 15px;
+      padding: 10px 14px;
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s;
       border: 1px solid transparent;
+      font-size: 0.95rem;
       display: block;
+      text-align: left;
     }
 
     input[type="radio"] {
@@ -79,9 +89,9 @@
       padding: 10px;
       border-radius: 10px;
       border: 1px solid #ccc;
-      font-size: 14px;
+      font-size: 0.95rem;
       resize: none;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     button {
@@ -90,7 +100,7 @@
       border: none;
       color: white;
       padding: 12px;
-      font-size: 16px;
+      font-size: 1rem;
       border-radius: 10px;
       cursor: pointer;
       transition: 0.3s;
@@ -98,52 +108,64 @@
       letter-spacing: 0.5px;
     }
 
-    button:hover {
-      transform: scale(1.05);
+    button:active {
+      transform: scale(0.98);
     }
 
     .result {
       text-align: center;
       margin-top: 10px;
-      font-size: 15px;
+      font-size: 0.95rem;
       color: #333;
+      padding: 8px;
     }
 
     .hidden { display: none; }
 
+    /* Kalpler */
     .heart {
-      position: absolute;
-      width: 20px;
-      height: 20px;
+      position: fixed;
+      width: 16px;
+      height: 16px;
       background: #ffb6c1;
       transform: rotate(45deg);
       animation: float 6s infinite ease-in-out;
-      opacity: 0.8;
+      opacity: 0.7;
+      z-index: 0;
     }
 
     .heart::before,
     .heart::after {
       content: "";
       position: absolute;
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       background: #ffb6c1;
       border-radius: 50%;
     }
 
-    .heart::before { top: -10px; left: 0; }
-    .heart::after { top: 0; left: -10px; }
+    .heart::before { top: -8px; left: 0; }
+    .heart::after { top: 0; left: -8px; }
 
     @keyframes float {
       0% { transform: translateY(0) rotate(45deg); opacity: 1; }
-      100% { transform: translateY(-700px) rotate(45deg); opacity: 0; }
+      100% { transform: translateY(-800px) rotate(45deg); opacity: 0; }
     }
 
     img {
       max-width: 100%;
+      height: auto;
       border-radius: 15px;
       margin-bottom: 15px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.4rem; }
+      p { font-size: 0.95rem; }
+      button { font-size: 0.95rem; }
+      label { font-size: 0.9rem; }
+      input[type="text"], textarea { font-size: 0.9rem; }
     }
   </style>
 </head>
@@ -160,8 +182,9 @@
   <div class="welcome" id="welcomeScreen">
     <h1>💘 Hoş Geldin Elif Sude! 💘</h1>
     <p>
-    Hazırsan seninle ilgili birkaç soru soracağım... 💞<br>
-    Cevap vermek zorunluuuu!!!</p>
+      Hazırsan seninle ilgili birkaç soru soracağım... 💞<br>
+      Cevap vermek zorunluuuu!!! 😍
+    </p>
     <button id="startBtn">Teste Başla 💖</button>
   </div>
 
@@ -182,106 +205,25 @@
   </div>
 
   <script>
-    const FORMSPREE_URL = "https://formspree.io/f/mnngozeo"; // 💌 kendi Formspree linkini ekle!
+    const FORMSPREE_URL = "https://formspree.io/f/mnngozeo";
 
     const questions = [
-      {
-        type: "text",
-        question: "Tam şuan ne yapıyorsun?",
-      },
-      {
-        type: "radio",
-        question: "Hayat nasıl gidiyor?",
-        options: ["Mükemmel", "Fena değil", "Berbat", "Çalkantılı"],
-        allowText: true
-      },
-      {
-        type: "radio",
-        question: "Dersler Nasıl?",
-        options: ["Çalışmaya çalışıyorum", "Bende bilmiyorum", "hiç sorma rezalet ", "Mükemmel"],
-        allowText: true
-      },
-      {
-        type: "radio",
-        question: "Seni rahatsız ettim mi/ediyor muyum?",
-        options: ["evet", "hayır", "biraz", "beni rahtsız edemezsin"],
-        allowText: true
-      },
-      {
-        type: "text",
-        question: "Bir günün nasıl geçiyor?",
-      },
-      {
-        type: "radio",
-        question: "Manitan,sevdiğin,hoşlandığın,konuştuğun varmı?",
-        options: ["var", "yok","arıyoz"],
-        allowText: true
-      },
-      {
-        type: "radio",
-        question: "Aramız Nasıl?",
-        options: ["İyi", "Kötü", "aramız yok", "Bilmiyorum"],
-        allowText: true
-      },
-      {
-        type: "image",
-        question: "Bu fotoğrafa baktığında ne hissediyorsun? Sana benzerliği kaç.",
-        image: "https://resmim.net/cdn/2025/10/16/j4BRRQ.png", // 📸 kendi fotoğrafının URL'si
-        options: ["0-2", "2-4", "4-6", "6-8","8-10"],
-        allowText: true
-      },
-      {
-        type: "text",
-        question: "Yaz tatilinden memnunmsun? Genel olarak nasıldı?iyi kötü yönleri.",
-      },
-      {
-        type: "text",
-        question: "Manitacılık işleri hakkında düşüncen",
-      },
-      {
-        type: "radio",
-        question: "Bir gün buluşma,konuşma ihtimalimiz?(Date)",
-        options: ["yok", "1/1000", "1/100", "1/10","Düşünmem Lazım","Düşünmeme gerek bile yok","👍"],
-        allowText: true
-      },
-      {
-        type: "radio",
-        question: "Aşık olduğunda genelde ne yaparsın?",
-        options: ["Sessizce izlerim 💭", "Yaklaşmaya çalışırım 💬", "Duygularımı gizlerim 💌", "Direkt söylerim 💥"],
-        allowText: true
-      },
-      {
-        type: "radio",
-        question: "Birinin sana ilgi duyduğunu nasıl anlarsın?",
-        options: ["Bakışlarından 👀", "Davranışlarından 💞", "Mesajlarından 💬", "Sadece hissederim 💫"]
-      },
-      
-      {
-        type: "radio",
-        question: "En romantik bulduğun şey hangisi?",
-        options: ["Mektup almak 💌", "Gecenin sessizliği 🌙", "El ele yürümek 🌸", "Bir bakışta her şeyi anlatmak 👀"]
-      },
-      {
-        type: "radio",
-        question: "Sevdiğin kişiye duygularını nasıl belli edersin?",
-        options: ["Küçük jestlerle 🎁", "Sözlerle 💬", "Bakışlarla 👀", "Belli etmem 🙊"],
-        allowText: true
-      },
-      {
-        type: "radio",
-        question: "İlk görüşte aşka inanır mısın?",
-        options: ["Evet 💘", "Hayır 🤔", "Belki 💭"]
-      },
-      {
-        type: "radio",
-        question: "Bir ilişki senin için ne ifade eder?",
-        options: ["Güven 🤝", "Tutku 🔥", "Sadakat 💍", "Paylaşım 💞"],
-        allowText: true
-      },
-      {
-        type: "text",
-        question: "Son Olarak Sence gerçek aşk nedir? 💖 Duygularını serbestçe yaz..."
-      }
+      { type: "text", question: "Tam şuan ne yapıyorsun?" },
+      { type: "radio", question: "Hayat nasıl gidiyor?", options: ["Mükemmel", "Fena değil", "Berbat", "Çalkantılı"], allowText: true },
+      { type: "radio", question: "Dersler Nasıl?", options: ["Çalışmaya çalışıyorum", "Bende Bilmiyorum", "hic sorma Rezalett ", "Mükemmel"], allowText: true },
+      { type: "radio", question: "Seni rahatsız ettim mi?", options: ["Evet", "Hayır", "Biraz", "Beni rahatsız edemezsin"], allowText: true },
+      { type: "text", question: "Bir günün nasıl geçiyor?" },
+      { type: "radio", question: "Manitan, sevdiğin, hoşlandığın biri var mı?", options: ["Var ", "Yok ", "Arıyoruz"], allowText: true },
+      { type: "radio", question: "Aramız nasıl?", options: ["İyi", "Kötü", "Aramız yok", "bilmiyorum"], allowText: true },
+      { type: "image", question: "Bu fotoğrafa baktığında ne hissediyorsun? Benzerlik kaç?", image: "https://resmim.net/cdn/2025/10/16/j4BRRQ.png", options: ["0-2", "2-4", "4-6", "6-8", "8-10"], allowText: true },
+      { type: "text", question: "Yaz tatilinden memnun musun? Nasıldı?" },
+      { type: "text", question: "Manitacılık işleri hakkında düşüncen?" },
+      { type: "radio", question: "Bir gün konuşma veya buluşma ihtimalimiz?", options: ["Yok ", "1/1000", "1/100", "1/10", "Düşünmem lazım ", "👍"], allowText: true },
+      { type: "radio", question: "Aşık olduğunda genelde ne yaparsın?", options: ["Sessizce izlerim 💭", "Yaklaşırım 💬", "Gizlerim 💌", "Direkt söylerim 💥"], allowText: true },
+      { type: "radio", question: "Birinin sana ilgi duyduğunu nasıl anlarsın?", options: ["Bakışlarından 👀", "Davranışlarından 💞", "Mesajlarından 💬", "Sadece hissederim 💫"] },
+      { type: "radio", question: "En romantik bulduğun şey hangisi?", options: ["Mektup almak 💌", "Gecenin sessizliği 🌙", "El ele yürümek 🌸", "Bir bakışta her şeyi anlatmak 👀"] },
+      { type: "radio", question: "İlk görüşte aşka inanır mısın?", options: ["Evet 💘", "Hayır 🤔", "Belki 💭"] },
+      { type: "text", question: "Son olarak... Gerçek aşk sence nedir? 💖" }
     ];
 
     let current = 0;
@@ -302,6 +244,7 @@
       welcomeScreen.classList.add("hidden");
       quizCard.classList.remove("hidden");
       loadQuestion();
+      window.scrollTo(0, 0);
     });
 
     function loadQuestion() {
@@ -366,6 +309,7 @@
         loadQuestion();
         textAnswerEl.value = "";
         extraTextEl.value = "";
+        window.scrollTo(0, 0);
       } else {
         questionEl.textContent = "💌 Cevapların gönderiliyor...";
         optionsEl.style.display = "none";
@@ -374,9 +318,7 @@
         nextBtn.style.display = "none";
 
         const formData = new FormData();
-        Object.keys(answers).forEach(key => {
-          formData.append(key, answers[key]);
-        });
+        Object.keys(answers).forEach(key => formData.append(key, answers[key]));
 
         try {
           const res = await fetch(FORMSPREE_URL, {
@@ -386,7 +328,7 @@
           });
 
           if (res.ok) {
-            resultEl.innerHTML = "💖 Cevapların başarıyla gönderildi! Kalbini paylaştığın için teşekkürler.";
+            resultEl.innerHTML = "💖 Cevapların başarıyla gönderildi! Kalbini paylaştığın için teşekkürler 💌";
           } else {
             resultEl.innerHTML = "⚠️ Bir hata oluştu, lütfen tekrar dene.";
           }
